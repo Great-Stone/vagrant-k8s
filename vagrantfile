@@ -1,0 +1,40 @@
+IMAGE_NAME = "bento/ubuntu-18.04"
+COUNTER = 3
+Vagrant.configure("2") do |config|
+  config.vm.box = IMAGE_NAME
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+
+  config.vm.define "master", primary: true do |master|
+    master.vm.box = IMAGE_NAME
+    master.vm.network "private_network", ip: "172.28.128.100"
+    master.vm.hostname = "master"
+    master.vm.provision "kube", type: "shell", privileged: true, path: "provisioning/scripts/kube.sh"
+    master.vm.provision "kube_init", type: "shell", preserve_order: true, privileged: true, path: "provisioning/scripts/kube_init.sh"
+    master.vm.provision "helm_install", type: "shell", preserve_order: true, privileged: true, path: "provisioning/scripts/helm_install.sh"
+    master.vm.provision "files", type: "file", preserve_order: true, source: "provisioning/files", destination: "/tmp"
+    master.vm.provision "license", type: "file", preserve_order: true, source: "provisioning/license", destination: "/tmp"
+    master.vm.provision "consul_install", type: "shell", preserve_order: true, privileged: true, run: "never", path: "provisioning/scripts/consul_install.sh"
+  end
+
+  (1..COUNTER).each do |i|
+    config.vm.define "node-#{i}" do |node|
+        node.vm.box = IMAGE_NAME
+        node.vm.network "private_network", ip: "172.28.128.#{i + 100}"
+        node.vm.hostname = "node-#{i}"
+        node.vm.provision "kube", type: "shell", privileged: true, path: "provisioning/scripts/kube.sh"
+        node.vm.provision "shell-1", type: "shell", privileged: true, inline: <<-SHELL
+        sudo /vagrant/join.sh
+        sudo systemctl daemon-reload
+        sudo systemctl restart kubelet
+        SHELL
+        node.vm.provision "shell-2", type: "shell", privileged: true, inline: <<-SHELL
+        echo 'Environment="KUBELET_EXTRA_ARGS=--node-ip=172.28.128.#{i + 100}"' >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+        sudo systemctl daemon-reload
+        sudo systemctl restart kubelet
+        SHELL
+    end
+  end
+end
