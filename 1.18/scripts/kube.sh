@@ -1,3 +1,4 @@
+# /bin/bash
 sudo swapoff -a
 sudo sed -i '/swap/d' /etc/fstab
 sudo apt-get update
@@ -12,11 +13,13 @@ stable"
 sudo apt-get update
 sleep 1
 
-export docker_ver=5:19.03.15~3-0~ubuntu-bionic
 sudo apt-get install -y docker-ce=$docker_ver docker-ce-cli=$docker_ver containerd.io
+sudo systemctl enable docker
+sudo systemctl start docker
 
 # First Permission
-sudo chown $USER:docker /etc/docker
+sudo mkdir /etc/docker
+# sudo chown $USER:docker /etc/docker
 
 # Setup daemon.
 sudo cat > /etc/docker/daemon.json <<EOF
@@ -31,8 +34,9 @@ sudo cat > /etc/docker/daemon.json <<EOF
 EOF
 
 sudo mkdir -p /etc/systemd/system/docker.service.d
+
 sudo systemctl daemon-reload
-sudo systemctl start docker
+sudo systemctl restart docker
 sudo systemctl enable docker
 sudo modprobe br_netfilter
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -47,6 +51,5 @@ EOF
 sudo apt-get update
 sleep 1
 
-export k8s_ver=1.18.20-00
 sudo apt-get install -y kubelet=$k8s_ver kubeadm=$k8s_ver kubectl=$k8s_ver
 sudo apt-mark hold kubelet kubeadm kubectl

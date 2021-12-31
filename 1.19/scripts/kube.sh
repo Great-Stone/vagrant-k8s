@@ -13,8 +13,30 @@ stable"
 sudo apt-get update
 sleep 1
 
-sudo apt-get install -y docker-ce=5:19.03.15~3-0~ubuntu-bionic docker-ce-cli=5:19.03.15~3-0~ubuntu-bionic containerd.io
+sudo apt-get install -y docker-ce=$docker_ver docker-ce-cli=$docker_ver containerd.io
+sudo systemctl enable docker
 sudo systemctl start docker
+
+# First Permission
+sudo mkdir /etc/docker
+# sudo chown $USER:docker /etc/docker
+
+# Setup daemon.
+sudo cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker
 sudo systemctl enable docker
 sudo modprobe br_netfilter
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -29,5 +51,5 @@ EOF
 sudo apt-get update
 sleep 1
 
-sudo apt-get install -y kubelet=1.19.10-00 kubeadm=1.19.10-00 kubectl=1.19.10-00
+sudo apt-get install -y kubelet=$k8s_ver kubeadm=$k8s_ver kubectl=$k8s_ver
 sudo apt-mark hold kubelet kubeadm kubectl
