@@ -11,7 +11,7 @@
 
 Menu > Host Network Manager > Create
 
-- IPv4 Address : 192.168.60.1
+- IPv4 Address (sample) : 192.168.60.1
 - IPv4 Network Mask : 255.255.255.0
 
 ![image-20210419215511702](https://github.com/Great-Stone/images/raw/master/uPic/Gs36kl.png)
