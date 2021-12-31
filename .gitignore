@@ -1,3 +1,5 @@
 **/.kube
 **/.vagrant
 **/join.sh
+**/k8s-pv
+**/trash

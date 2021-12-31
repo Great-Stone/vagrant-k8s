@@ -1,0 +1,37 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceRouter
+metadata:
+  name: gs-backend
+spec:
+  routes:
+    - match:
+        http:
+          pathPrefix: '/v1'
+      destination:
+        service: gs-backend
+        serviceSubset: v1
+    - match:
+        http:
+          pathPrefix: '/v2'
+      destination:
+        service: gs-backend
+        serviceSubset: v2
+        # numRetries: 3
+        # retryOnStatusCodes:
+        #   - 500
+    - match:
+        http:
+          queryParam:
+            - name: version
+              exact: 'v1'
+      destination:
+        service: gs-backend
+        serviceSubset: v1
+    - match:
+        http:
+          queryParam:
+            - name: version
+              exact: 'v2'
+      destination:
+        service: gs-backend
+        serviceSubset: v2

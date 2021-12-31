@@ -10,7 +10,7 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   hostPath:
-    path: /vagrant/k8s-pv/consul01
+    path: /vagrant/k8s-pv/pv01
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -24,7 +24,7 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   hostPath:
-    path: /vagrant/k8s-pv/consul02
+    path: /vagrant/k8s-pv/pv02
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -38,4 +38,4 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   hostPath:
-    path: /vagrant/k8s-pv/consul03
+    path: /vagrant/k8s-pv/pv03
