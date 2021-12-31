@@ -1,8 +1,9 @@
 IMAGE_NAME = "bento/ubuntu-18.04"
 
+K8S_MINOR_VERSION = "19"
 NETWORK_SUB = "192.168.60."
 START_IP = 110
-POD_IP = "19"
+POD_CIDR = "10.#{K8S_MINOR_VERSION}.0.0/16"
 
 cluster = {
   "master" => { :cpus => 2, :mem => 2048 },
@@ -11,9 +12,9 @@ cluster = {
 
 NODE_COUNT = 1
 
-VM_GROUP_NAME = "k8s-1.19"
+VM_GROUP_NAME = "k8s-1.#{K8S_MINOR_VERSION}"
 DOCKER_VER = "5:19.03.15~3-0~ubuntu-bionic"
-KUBE_VER = "1.19.16-00"
+KUBE_VER = "1.#{K8S_MINOR_VERSION}.16-00"
 
 Vagrant.configure("2") do |config|
   config.vm.box = IMAGE_NAME
@@ -30,7 +31,7 @@ Vagrant.configure("2") do |config|
       OUTPUT_FILE=/vagrant/join.sh
       rm -rf /vagrant/join.sh
       rm -rf /vagrant/.kube
-      sudo kubeadm init --apiserver-advertise-address=#{NETWORK_SUB}#{START_IP} --pod-network-cidr=10.#{POD_IP}.0.0/16
+      sudo kubeadm init --apiserver-advertise-address=#{NETWORK_SUB}#{START_IP} --pod-network-cidr=#{POD_CIDR}
       sudo kubeadm token create --print-join-command > /vagrant/join.sh
       chmod +x $OUTPUT_FILE
       mkdir -p $HOME/.kube
