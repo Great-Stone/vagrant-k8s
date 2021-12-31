@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
       v.gui = false
       v.memory = cluster['master'][:mem]
       v.cpus = cluster['master'][:cpus]
-      v.customize ["modifyvm", :id, "--groups", "/k8s"]
+      v.customize ["modifyvm", :id, "--groups", "/#{VM_GROUP_NAME}"]
       v.customize ["modifyvm", :id, "--vram", "9"]
     end # end provider
   end
